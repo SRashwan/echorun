@@ -1,0 +1,424 @@
+<!DOCTYPE html>
+<html lang="en" class="scroll-smooth">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>ECHO RUN | The Last Calibration</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;700;900&family=Share+Tech+Mono&display=swap" rel="stylesheet">
+    
+    <script>
+        tailwind.config = {
+            theme: {
+                extend: {
+                    colors: {
+                        void: '#000013',
+                        panel: '#F0EFF8',
+                        echoblue: '#3AACFF',
+                        hazard: '#FF5A1A',
+                        recovery: '#00E45A',
+                        ghost: '#88CCFF',
+                        darkgray: '#11111a'
+                    },
+                    fontFamily: {
+                        sans: ['Inter', 'sans-serif'],
+                        mono: ['Share Tech Mono', 'monospace'],
+                    },
+                    backgroundImage: {
+                        'scanlines': 'linear-gradient(to bottom, rgba(255,255,255,0), rgba(255,255,255,0) 50%, rgba(0,0,0,0.1) 50%, rgba(0,0,0,0.1))',
+                    }
+                }
+            }
+        }
+    </script>
+
+    <style>
+        body {
+            background-color: #000013;
+            color: #F0EFF8;
+            overflow-x: hidden;
+        }
+
+        /* CRT Scanline Overlay */
+        .scanline-overlay {
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100vw;
+            height: 100vh;
+            background-image: linear-gradient(to bottom, rgba(255,255,255,0), rgba(255,255,255,0) 50%, rgba(0,0,0,0.2) 50%, rgba(0,0,0,0.2));
+            background-size: 100% 4px;
+            pointer-events: none;
+            z-index: 9999;
+            opacity: 0.6;
+        }
+
+        /* Glitch text effect for thriller vibe */
+        .glitch-text {
+            position: relative;
+        }
+        .glitch-text::before, .glitch-text::after {
+            content: attr(data-text);
+            position: absolute;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            opacity: 0.8;
+        }
+        .glitch-text::before {
+            left: 2px;
+            text-shadow: -2px 0 #FF5A1A;
+            clip: rect(24px, 550px, 90px, 0);
+            animation: glitch-anim-2 3s infinite linear alternate-reverse;
+        }
+        .glitch-text::after {
+            left: -2px;
+            text-shadow: -2px 0 #3AACFF;
+            clip: rect(85px, 550px, 140px, 0);
+            animation: glitch-anim 2.5s infinite linear alternate-reverse;
+        }
+
+        @keyframes glitch-anim {
+            0% { clip: rect(10px, 9999px, 44px, 0); }
+            20% { clip: rect(81px, 9999px, 11px, 0); }
+            40% { clip: rect(32px, 9999px, 89px, 0); }
+            60% { clip: rect(98px, 9999px, 55px, 0); }
+            80% { clip: rect(23px, 9999px, 78px, 0); }
+            100% { clip: rect(65px, 9999px, 12px, 0); }
+        }
+        @keyframes glitch-anim-2 {
+            0% { clip: rect(65px, 9999px, 100px, 0); }
+            20% { clip: rect(12px, 9999px, 80px, 0); }
+            40% { clip: rect(89px, 9999px, 30px, 0); }
+            60% { clip: rect(45px, 9999px, 90px, 0); }
+            80% { clip: rect(78px, 9999px, 20px, 0); }
+            100% { clip: rect(10px, 9999px, 60px, 0); }
+        }
+
+        /* Scroll Reveal Animation Classes */
+        .reveal {
+            opacity: 0;
+            transform: translateY(30px);
+            transition: all 0.8s cubic-bezier(0.5, 0, 0, 1);
+        }
+        .reveal.active {
+            opacity: 1;
+            transform: translateY(0);
+        }
+
+        /* Custom Scrollbar */
+        ::-webkit-scrollbar {
+            width: 8px;
+        }
+        ::-webkit-scrollbar-track {
+            background: #000013;
+        }
+        ::-webkit-scrollbar-thumb {
+            background: #3AACFF;
+            border-radius: 4px;
+        }
+        ::-webkit-scrollbar-thumb:hover {
+            background: #FF5A1A;
+        }
+
+        .hud-border {
+            border: 1px solid rgba(58, 172, 255, 0.3);
+            background: linear-gradient(135deg, rgba(0,0,19,0.9) 0%, rgba(17,17,26,0.9) 100%);
+            box-shadow: 0 0 15px rgba(58, 172, 255, 0.1) inset;
+        }
+        
+        .hazard-border {
+            border-left: 4px solid #FF5A1A;
+        }
+        .safe-border {
+            border-left: 4px solid #00E45A;
+        }
+        .info-border {
+            border-left: 4px solid #3AACFF;
+        }
+    </style>
+</head>
+<body class="antialiased selection:bg-echoblue selection:text-void">
+
+    <div class="scanline-overlay"></div>
+
+    <nav class="fixed top-0 w-full z-50 bg-void/80 backdrop-blur-md border-b border-echoblue/20 px-6 py-4 flex justify-between items-center">
+        <div class="flex items-center gap-2">
+            <div class="w-3 h-3 bg-echoblue rounded-full animate-pulse"></div>
+            <span class="font-mono text-echoblue tracking-widest text-sm font-bold">SYSLOG // ACTIVE</span>
+        </div>
+        <div class="hidden md:flex gap-8 font-mono text-xs tracking-wider text-panel/60">
+            <a href="#premise" class="hover:text-echoblue transition-colors">01. OVERVIEW</a>
+            <a href="#gauntlet" class="hover:text-echoblue transition-colors">02. THE TRACK</a>
+            <a href="#mechanics" class="hover:text-echoblue transition-colors">03. DATA LOGS</a>
+        </div>
+        <a href="#download" class="border border-echoblue text-echoblue px-4 py-2 text-xs font-mono hover:bg-echoblue hover:text-void transition-all duration-300 shadow-[0_0_10px_rgba(58,172,255,0.3)]">INITIATE RUN</a>
+    </nav>
+
+    <header class="relative w-full h-screen flex items-center justify-center overflow-hidden">
+        <!-- Background Image (Gameplay Screenshot) -->
+        <div class="absolute inset-0 z-0">
+            <img src="WhatsApp Image 2026-07-12 at 3.54.40 PM (1).jpeg" alt="Echo Run Gameplay" class="w-full h-full object-cover object-center opacity-40 scale-105 transform origin-center animate-[pulse_10s_ease-in-out_infinite]" />
+            <div class="absolute inset-0 bg-gradient-to-t from-void via-void/80 to-transparent"></div>
+            <div class="absolute inset-0 bg-gradient-to-r from-void via-transparent to-void"></div>
+        </div>
+
+        <div class="relative z-10 flex flex-col items-center text-center px-4 max-w-4xl">
+            <p class="font-mono text-hazard tracking-[0.3em] mb-4 text-sm animate-pulse">CRITICAL FAILURE DETECTED</p>
+            <h1 class="text-6xl md:text-8xl font-black tracking-tighter mb-2 glitch-text" data-text="ECHO RUN">ECHO RUN</h1>
+            <h2 class="text-2xl md:text-4xl font-light tracking-[0.2em] text-echoblue mb-8">THE LAST CALIBRATION</h2>
+            
+            <div class="hud-border p-6 md:p-8 mt-8 max-w-2xl reveal">
+                <!-- Referencing Image 6 visually via text -->
+                <p class="text-lg md:text-2xl font-light italic text-panel/80 mb-4 border-l-2 border-echoblue pl-4 text-left">
+                    "A training facility that remembers every failed run."
+                </p>
+                <p class="font-mono text-xs text-panel/50 text-left">-- SUBJECT: MARA // STATUS: TRAPPED</p>
+            </div>
+
+            <div class="mt-12 flex flex-col sm:flex-row gap-6">
+                <a href="#premise" class="flex items-center gap-3 text-panel hover:text-echoblue transition-colors font-mono group">
+                    <span class="w-8 h-[1px] bg-panel group-hover:bg-echoblue transition-colors"></span>
+                    ACCESS LOGS
+                    <svg class="w-4 h-4 animate-bounce" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 14l-7 7m0 0l-7-7m7 7V3"></path></svg>
+                </a>
+            </div>
+        </div>
+        
+        <!-- HUD Elements Overlay -->
+        <div class="absolute top-24 left-6 hidden md:block font-mono text-[10px] text-panel/40 leading-tight">
+            SYS.MEM: OVERLOAD<br>
+            CORRUPTION: 72%<br>
+            GHOST ENTITIES: ACTIVE
+        </div>
+        <div class="absolute bottom-10 right-6 font-mono text-[10px] text-echoblue/60 text-right">
+            v1.0.4.UE5<br>
+            SECURE CONNECTION
+        </div>
+    </header>
+
+    <section id="premise" class="py-24 relative z-10 px-6 max-w-6xl mx-auto">
+        <div class="grid md:grid-cols-2 gap-16 items-center">
+            <div class="reveal">
+                <div class="flex items-center gap-3 mb-6">
+                    <div class="w-12 h-[2px] bg-echoblue"></div>
+                    <span class="font-mono text-echoblue uppercase tracking-widest text-sm">Game Vision</span>
+                </div>
+                <h3 class="text-3xl md:text-5xl font-bold mb-6 leading-tight">Navigate a surreal corridor that logs every failure.</h3>
+                <div class="space-y-4 text-panel/70 font-light leading-relaxed">
+                    <p>Echo Run is a short, tense third-person traversal experience. You are Mara, forced into the Echo Track—a brutal, shifting training facility.</p>
+                    <p>But the track is not empty. It remembers. Every time you fail, every time the hazards consume you, an <span class="text-ghost font-bold">Echo Imprint</span> is left behind. You run alongside the ghosts of your own past mistakes.</p>
+                    <p>Your objective is simple: Observe. Move. Survive. Reach the extraction platform before your health reaches zero.</p>
+                </div>
+                <div class="mt-8 grid grid-cols-3 gap-4 font-mono text-xs text-center">
+                    <div class="hud-border p-3 flex flex-col gap-2">
+                        <svg class="w-6 h-6 mx-auto text-echoblue" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15 12a3 3 0 11-6 0 3 3 0 016 0z"></path><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M2.458 12C3.732 7.943 7.523 5 12 5c4.478 0 8.268 2.943 9.542 7-1.274 4.057-5.064 7-9.542 7-4.477 0-8.268-2.943-9.542-7z"></path></svg>
+                        <span>OBSERVE</span>
+                    </div>
+                    <div class="hud-border p-3 flex flex-col gap-2">
+                        <svg class="w-6 h-6 mx-auto text-panel" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M13 10V3L4 14h7v7l9-11h-7z"></path></svg>
+                        <span>MOVE</span>
+                    </div>
+                    <div class="hud-border p-3 flex flex-col gap-2">
+                        <svg class="w-6 h-6 mx-auto text-hazard" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 8v4m0 4h.01M21 12a9 9 0 11-18 0 9 9 0 0118 0z"></path></svg>
+                        <span>SURVIVE</span>
+                    </div>
+                </div>
+            </div>
+            
+            <div class="reveal relative">
+                <!-- Embedding Image 6 as a thematic element -->
+                <div class="hud-border p-2">
+                    <div class="absolute -top-3 -right-3 bg-void border border-echoblue px-2 py-1 font-mono text-[10px] text-echoblue z-10">CORE_PREMISE.jpeg</div>
+                    <img src="WhatsApp Image 2026-07-12 at 3.54.40 PM (5).jpeg" alt="Core Premise Document" class="w-full h-auto opacity-80 hover:opacity-100 transition-opacity filter contrast-125" />
+                </div>
+                <div class="absolute -bottom-6 -left-6 w-24 h-24 bg-echoblue/10 rounded-full blur-2xl"></div>
+            </div>
+        </div>
+    </section>
+
+    <section id="gauntlet" class="py-24 bg-darkgray/50 border-y border-echoblue/10 relative">
+        <div class="max-w-6xl mx-auto px-6">
+            <div class="text-center mb-16 reveal">
+                <h2 class="text-4xl font-bold tracking-tight mb-4">THE CALIBRATION TRACK</h2>
+                <p class="font-mono text-sm text-panel/50">SECTOR OVERVIEW // 6 STAGES TO EXTRACTION</p>
+            </div>
+
+            <!-- Embedding Image 1 as the master layout reference -->
+            <div class="mb-20 reveal hud-border p-2 relative">
+                <div class="absolute -top-3 -left-3 bg-void border border-echoblue px-2 py-1 font-mono text-[10px] text-echoblue z-10">LEVEL_GEOMETRY.jpeg</div>
+                <img src="WhatsApp Image 2026-07-12 at 3.54.40 PM.jpeg" alt="Echo Run Concept Overview" class="w-full h-auto shadow-[0_0_30px_rgba(0,0,0,0.8)]" />
+            </div>
+
+            <div class="grid md:grid-cols-2 lg:grid-cols-3 gap-6">
+                <!-- Stage 1 -->
+                <div class="hud-border p-6 info-border reveal">
+                    <div class="font-mono text-echoblue mb-2 text-sm">STAGE 01</div>
+                    <h4 class="text-xl font-bold mb-3">WAKE CORRIDOR</h4>
+                    <p class="text-sm text-panel/70">A tilted medical corridor. Low-intensity blue emergency strips guide the way forward. The calm before the trial.</p>
+                </div>
+                <!-- Stage 2 -->
+                <div class="hud-border p-6 info-border reveal" style="transition-delay: 100ms;">
+                    <div class="font-mono text-echoblue mb-2 text-sm">STAGE 02</div>
+                    <h4 class="text-xl font-bold mb-3">MOVEMENT HALL</h4>
+                    <p class="text-sm text-panel/70">A long runway demanding momentum. Distance creates urgency. Reflective floor highlights emphasize speed.</p>
+                </div>
+                <!-- Stage 3 -->
+                <div class="hud-border p-6 hazard-border reveal" style="transition-delay: 200ms;">
+                    <div class="font-mono text-hazard mb-2 text-sm">STAGE 03</div>
+                    <h4 class="text-xl font-bold mb-3">BROKEN FLOOR</h4>
+                    <p class="text-sm text-panel/70">Gaps and broken panels test timing and jumps. The void below is fatal. Orange underlight warns of the danger.</p>
+                </div>
+                <!-- Stage 4 -->
+                <div class="hud-border p-6 hazard-border reveal">
+                    <div class="font-mono text-hazard mb-2 text-sm">STAGE 04</div>
+                    <h4 class="text-xl font-bold mb-3">HEAT VENTS</h4>
+                    <p class="text-sm text-panel/70">Strong orange emissive panels deal rapid damage on contact. Find a safer route or risk the burn.</p>
+                </div>
+                <!-- Stage 5 -->
+                <div class="hud-border p-6 safe-border reveal" style="transition-delay: 100ms;">
+                    <div class="font-mono text-recovery mb-2 text-sm">STAGE 05</div>
+                    <h4 class="text-xl font-bold mb-3">RECOVERY ALCOVE</h4>
+                    <p class="text-sm text-panel/70">A rare safe space. Soft green radial light. Step on the pad to initiate a Recovery Pulse and restore vital HP.</p>
+                </div>
+                <!-- Stage 6 -->
+                <div class="hud-border p-6 info-border reveal" style="transition-delay: 200ms;">
+                    <div class="font-mono text-echoblue mb-2 text-sm">STAGE 06</div>
+                    <h4 class="text-xl font-bold mb-3">FINAL SPRINT & EXTRACT</h4>
+                    <p class="text-sm text-panel/70">High contrast run to the Blue-White Extraction Gate. Survive the final push while surrounded by your Echo ghosts.</p>
+                </div>
+            </div>
+        </div>
+    </section>
+
+    <section id="mechanics" class="py-24 relative z-10 px-6 max-w-7xl mx-auto">
+        <div class="grid lg:grid-cols-12 gap-12">
+            
+            <!-- Mechanics Copy -->
+            <div class="lg:col-span-5 flex flex-col justify-center reveal">
+                <div class="flex items-center gap-3 mb-6">
+                    <div class="w-12 h-[2px] bg-hazard"></div>
+                    <span class="font-mono text-hazard uppercase tracking-widest text-sm">Survival Mechanics</span>
+                </div>
+                <h3 class="text-3xl font-bold mb-6">Precision is the only metric.</h3>
+                
+                <div class="space-y-6">
+                    <div class="flex gap-4 items-start">
+                        <div class="w-10 h-10 rounded-full bg-hazard/20 flex items-center justify-center border border-hazard shrink-0 mt-1">
+                            <span class="text-hazard font-bold">-20</span>
+                        </div>
+                        <div>
+                            <h5 class="font-bold text-lg text-hazard">Hazard Damage</h5>
+                            <p class="text-sm text-panel/70 mt-1">Contact with orange environmental elements immediately drains health. Damage resistance is zero by design.</p>
+                        </div>
+                    </div>
+                    
+                    <div class="flex gap-4 items-start">
+                        <div class="w-10 h-10 rounded-full bg-recovery/20 flex items-center justify-center border border-recovery shrink-0 mt-1">
+                            <span class="text-recovery font-bold">+35</span>
+                        </div>
+                        <div>
+                            <h5 class="font-bold text-lg text-recovery">Recovery Healing</h5>
+                            <p class="text-sm text-panel/70 mt-1">Locate green medical alcoves. Overlapping these zones triggers a health restoration sequence.</p>
+                        </div>
+                    </div>
+
+                    <div class="bg-void border border-echoblue/30 p-4 font-mono text-sm">
+                        <div class="flex justify-between border-b border-echoblue/20 pb-2 mb-2">
+                            <span class="text-panel/50">WIN CONDITION</span>
+                            <span class="text-recovery">ENTER EXTRACTION, HP > 0</span>
+                        </div>
+                        <div class="flex justify-between">
+                            <span class="text-panel/50">LOSE CONDITION</span>
+                            <span class="text-hazard">HEALTH REACHES 0 ANYWHERE</span>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Embedding Image 2 (Mechanics Specs) & Image 3 (Visual Design) as Data Tables -->
+            <div class="lg:col-span-7 space-y-6">
+                <div class="hud-border p-2 reveal">
+                    <div class="bg-void px-4 py-2 border-b border-echoblue/20 flex justify-between items-center">
+                        <span class="font-mono text-xs text-echoblue">FILE_REF: MECHANICS_SPEC.DAT</span>
+                        <div class="flex gap-1">
+                            <div class="w-2 h-2 rounded-full bg-hazard animate-pulse"></div>
+                            <div class="w-2 h-2 rounded-full bg-recovery"></div>
+                        </div>
+                    </div>
+                    <img src="WhatsApp Image 2026-07-12 at 3.54.40 PM (2).jpeg" alt="Game Mechanics Specification" class="w-full h-auto opacity-90 hover:opacity-100 transition-opacity" />
+                </div>
+                
+                <div class="grid sm:grid-cols-2 gap-6 reveal">
+                    <div class="hud-border p-2">
+                        <div class="bg-void px-2 py-1 border-b border-echoblue/20 font-mono text-[10px] text-echoblue">FILE_REF: VISUAL_LANG.DAT</div>
+                        <img src="WhatsApp Image 2026-07-12 at 3.54.40 PM (3).jpeg" alt="Visual Design Language" class="w-full h-full object-cover opacity-90" />
+                    </div>
+                    <div class="hud-border p-2">
+                        <div class="bg-void px-2 py-1 border-b border-echoblue/20 font-mono text-[10px] text-echoblue">FILE_REF: ASSETS_VFX.DAT</div>
+                        <img src="WhatsApp Image 2026-07-12 at 3.54.40 PM (4).jpeg" alt="Assets and VFX Brief" class="w-full h-full object-cover opacity-90" />
+                    </div>
+                </div>
+            </div>
+
+        </div>
+    </section>
+
+    <section id="download" class="py-32 relative flex items-center justify-center flex-col text-center border-t border-echoblue/20 bg-gradient-to-b from-darkgray to-void">
+        <div class="absolute inset-0 bg-[url('data:image/svg+xml;base64,PHN2ZyB3aWR0aD0iMjAiIGhlaWdodD0iMjAiIHhtbG5zPSJodHRwOi8vd3d3LnczLm9yZy8yMDAwL3N2ZyI+PHBhdGggZD0iTTEgMWgydjJIMXoiIGZpbGw9InJnYmEoNTgsIDE3MiwgMjU1LCAwLjA1KSIgZmlsbC1ydWxlPSJldmVub2RkIi8+PC9zdmc+')] opacity-50"></div>
+        
+        <div class="relative z-10 max-w-2xl px-6 reveal">
+            <h2 class="text-5xl font-black mb-6 glitch-text" data-text="PREPARE FOR DEPLOYMENT">PREPARE FOR DEPLOYMENT</h2>
+            <p class="text-panel/70 mb-10 font-light">The track is resetting. Your previous data has been purged. Only your Echoes remain. Built in Unreal Engine 5 for ultimate atmospheric fidelity.</p>
+            
+            <div class="flex flex-col sm:flex-row justify-center gap-6">
+                <button class="bg-echoblue text-void font-bold py-4 px-8 rounded-sm hover:bg-panel hover:text-void transition-all duration-300 shadow-[0_0_20px_rgba(58,172,255,0.5)] flex items-center justify-center gap-2">
+                    <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 16v1a3 3 0 003 3h10a3 3 0 003-3v-1m-4-4l-4 4m0 0l-4-4m4 4V4"></path></svg>
+                    DOWNLOAD PC DEMO
+                </button>
+                <button class="hud-border text-panel font-mono py-4 px-8 hover:bg-echoblue/10 transition-all duration-300">
+                    WISHLIST NOW
+                </button>
+            </div>
+            
+            <div class="mt-16 font-mono text-xs text-panel/40 flex flex-col md:flex-row justify-center gap-4 md:gap-12">
+                <span>TARGET PLATFORM: PC</span>
+                <span>ENGINE: UNREAL ENGINE 5</span>
+                <span>STATUS: CALIBRATING...</span>
+            </div>
+        </div>
+    </section>
+
+    <footer class="border-t border-white/5 py-8 text-center bg-void font-mono text-[10px] text-panel/30">
+        <p>&copy; 2026 Echo Run Simulation. All corrupted data is final.</p>
+    </footer>
+
+    <script>
+        document.addEventListener('DOMContentLoaded', () => {
+            // Scroll Reveal Logic
+            const revealElements = document.querySelectorAll('.reveal');
+
+            const revealObserver = new IntersectionObserver((entries, observer) => {
+                entries.forEach(entry => {
+                    if (entry.isIntersecting) {
+                        entry.target.classList.add('active');
+                        // Optional: Stop observing once revealed
+                        // observer.unobserve(entry.target); 
+                    }
+                });
+            }, {
+                root: null,
+                threshold: 0.15, // Trigger when 15% visible
+                rootMargin: "0px 0px -50px 0px"
+            });
+
+            revealElements.forEach(el => {
+                revealObserver.observe(el);
+            });
+        });
+    </script>
+</body>
+</html>
