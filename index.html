@@ -176,7 +176,7 @@
                 <p class="text-lg md:text-2xl font-light italic text-panel/80 mb-4 border-l-2 border-echoblue pl-4 text-left">
                     "A training facility that remembers every failed run."
                 </p>
-                <p class="font-mono text-xs text-panel/50 text-left">-- SUBJECT: MARA // STATUS: TRAPPED</p>
+                <p class="font-mono text-xs text-panel/50 text-left">:: SUBJECT: MARA // STATUS: TRAPPED</p>
             </div>
 
             <div class="mt-12 flex flex-col sm:flex-row gap-6">
@@ -294,6 +294,51 @@
         </div>
     </section>
 
+    <section id="subject-mara" class="py-32 relative z-10 w-full overflow-hidden border-b border-echoblue/10 bg-void">
+        <!-- Seamless Background integration of Mara -->
+        <div class="absolute inset-0 z-0">
+            <img src="Gemini_Generated_Image_i2wwybi2wwybi2ww-clean.png" alt="Subject Mara" class="w-full h-full object-cover object-center opacity-70 mix-blend-screen" style="mask-image: linear-gradient(to bottom, transparent 0%, black 15%, black 85%, transparent 100%); -webkit-mask-image: linear-gradient(to bottom, transparent 0%, black 15%, black 85%, transparent 100%);" />
+            <!-- Gradients to blend the image seamlessly into the void color -->
+            <div class="absolute inset-0 bg-gradient-to-r from-void via-void/80 to-transparent md:w-2/3"></div>
+            <div class="absolute inset-0 bg-gradient-to-t from-void via-transparent to-void"></div>
+            <div class="absolute inset-0 bg-gradient-to-l from-void/50 via-transparent to-transparent"></div>
+        </div>
+
+        <div class="max-w-6xl mx-auto px-6 relative z-10 grid md:grid-cols-2 gap-12 items-center">
+            <div class="reveal">
+                <div class="hud-border p-8 bg-void/80 backdrop-blur-md border-l-4 border-echoblue shadow-[0_0_30px_rgba(0,0,0,0.8)]">
+                    <div class="flex items-center gap-2 mb-4">
+                        <div class="w-2 h-2 bg-echoblue animate-pulse"></div>
+                        <span class="font-mono text-echoblue tracking-widest text-xs">BIOMETRIC SCAN COMPLETE</span>
+                    </div>
+                    <h2 class="text-5xl font-black mb-2 tracking-tighter text-panel">SUBJECT: MARA</h2>
+                    <h3 class="text-xl font-mono text-panel/50 mb-6">PROTOTYPE RUNNER v1.4</h3>
+                    
+                    <div class="space-y-4 font-light text-panel/80 leading-relaxed text-sm">
+                        <p>Plucked from the active roster for "specialized calibration," Mara is the only test subject to survive more than 12 cycles in the Echo Track. Her suit is equipped with experimental kinetic dampeners, designed to convert forward momentum into survival.</p>
+                        <p>She doesn't know who built the track. She only knows that every time she fails, a piece of her data remains behind. The ghosts she runs alongside are her own past attempts, repeating her fatal mistakes in an endless loop.</p>
+                    </div>
+
+                    <div class="mt-8 grid grid-cols-2 gap-4 font-mono text-[10px] text-panel/60">
+                        <div class="border border-echoblue/20 p-2 bg-void/50">
+                            <span class="text-echoblue block mb-1">SUIT STATUS</span>
+                            INTEGRITY: NOMINAL<br>
+                            KINETICS: ONLINE
+                        </div>
+                        <div class="border border-hazard/30 p-2 bg-void/50">
+                            <span class="text-hazard block mb-1">ECHO CORRUPTION</span>
+                            WARNING: 72%<br>
+                            MEMORY LEAK DETECTED
+                        </div>
+                    </div>
+                </div>
+            </div>
+            <div class="h-64 md:h-[500px]">
+                <!-- Empty container to frame the background image of Mara (back view) on the right -->
+            </div>
+        </div>
+    </section>
+
     <section id="mechanics" class="py-24 relative z-10 px-6 max-w-7xl mx-auto">
         <div class="grid lg:grid-cols-12 gap-12">
             
@@ -364,6 +409,109 @@
                 </div>
             </div>
 
+        </div>
+    </section>
+
+    <section id="media-intel" class="py-24 bg-darkgray/40 border-y border-echoblue/10 relative z-10">
+        <div class="max-w-6xl mx-auto px-6">
+            <div class="flex items-center gap-3 mb-12 reveal">
+                <div class="w-12 h-[2px] bg-ghost"></div>
+                <span class="font-mono text-ghost uppercase tracking-widest text-sm">Intercepted Transmissions // Media Intel</span>
+            </div>
+
+            <div class="grid md:grid-cols-3 gap-6">
+                <div class="hud-border p-6 bg-void/70 reveal group hover:bg-void transition-colors cursor-pointer">
+                    <div class="font-mono text-[10px] text-panel/40 mb-3 flex justify-between border-b border-panel/10 pb-2">
+                        <span>IGNITION GAMING</span>
+                        <span>12.OCT.2026</span>
+                    </div>
+                    <h4 class="text-lg font-bold mb-3 group-hover:text-echoblue transition-colors leading-tight">"A Brutal Masterpiece of Traversal"</h4>
+                    <p class="text-sm text-panel/60 font-light mb-4">Echo Run strips away the bloat of modern platformers and leaves you with raw, unforgiving momentum. The mechanic of racing your own failure ghosts adds a psychological layer to the horror of missing a jump.</p>
+                    <span class="font-mono text-[10px] text-echoblue uppercase">READ ARCHIVE &gt;</span>
+                </div>
+                
+                <div class="hud-border p-6 bg-void/70 reveal group hover:bg-void transition-colors cursor-pointer" style="transition-delay: 100ms;">
+                    <div class="font-mono text-[10px] text-panel/40 mb-3 flex justify-between border-b border-panel/10 pb-2">
+                        <span>POLY_BREAK</span>
+                        <span>08.OCT.2026</span>
+                    </div>
+                    <h4 class="text-lg font-bold mb-3 group-hover:text-hazard transition-colors leading-tight">Why 'The Last Calibration' Will Break You</h4>
+                    <p class="text-sm text-panel/60 font-light mb-4">The developers have crafted an aesthetic that is as hostile as it is beautiful. Every glowing orange vent feels like a threat, and the UE5 lighting makes every mistake visually spectacular.</p>
+                    <span class="font-mono text-[10px] text-hazard uppercase">READ ARCHIVE &gt;</span>
+                </div>
+
+                <div class="hud-border p-6 bg-void/70 reveal group hover:bg-void transition-colors cursor-pointer" style="transition-delay: 200ms;">
+                    <div class="font-mono text-[10px] text-panel/40 mb-3 flex justify-between border-b border-panel/10 pb-2">
+                        <span>INDIE DEV WATCH</span>
+                        <span>01.OCT.2026</span>
+                    </div>
+                    <h4 class="text-lg font-bold mb-3 group-hover:text-recovery transition-colors leading-tight">From Class Project to Cult Hit</h4>
+                    <p class="text-sm text-panel/60 font-light mb-4">Built by an elite student cohort, Echo Run proves that tight scope and obsessive polish trump massive budgets. This is the future of independent development.</p>
+                    <span class="font-mono text-[10px] text-recovery uppercase">READ ARCHIVE &gt;</span>
+                </div>
+            </div>
+        </div>
+    </section>
+
+    <section id="architects" class="py-32 relative z-10 px-6 max-w-5xl mx-auto">
+        <div class="text-center mb-16 reveal">
+            <h2 class="text-4xl font-bold tracking-tight mb-2">SYSTEM ARCHITECTS</h2>
+            <p class="font-mono text-sm text-panel/50">STUDENT DEVELOPMENT COHORT // OMEGA PROTOCOL</p>
+        </div>
+
+        <div class="grid grid-cols-2 md:grid-cols-4 gap-6">
+            <div class="hud-border p-6 text-center reveal bg-void/80 hover:-translate-y-2 transition-transform duration-300 shadow-[0_4px_20px_rgba(0,0,0,0.5)]">
+                <div class="w-20 h-20 mx-auto bg-darkgray border border-echoblue/30 rounded-full mb-4 flex items-center justify-center overflow-hidden">
+                    <svg class="w-10 h-10 text-panel/20" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="1.5" d="M16 7a4 4 0 11-8 0 4 4 0 018 0zM12 14a7 7 0 00-7 7h14a7 7 0 00-7-7z"></path></svg>
+                </div>
+                <h5 class="font-bold text-sm text-panel">[ TO BE ASSIGNED ]</h5>
+                <p class="font-mono text-[10px] text-echoblue mt-2">LEAD ENGINEER</p>
+            </div>
+            
+            <div class="hud-border p-6 text-center reveal bg-void/80 hover:-translate-y-2 transition-transform duration-300 shadow-[0_4px_20px_rgba(0,0,0,0.5)]" style="transition-delay: 100ms;">
+                <div class="w-20 h-20 mx-auto bg-darkgray border border-echoblue/30 rounded-full mb-4 flex items-center justify-center overflow-hidden">
+                    <svg class="w-10 h-10 text-panel/20" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="1.5" d="M16 7a4 4 0 11-8 0 4 4 0 018 0zM12 14a7 7 0 00-7 7h14a7 7 0 00-7-7z"></path></svg>
+                </div>
+                <h5 class="font-bold text-sm text-panel">[ TO BE ASSIGNED ]</h5>
+                <p class="font-mono text-[10px] text-hazard mt-2">ART DIRECTOR</p>
+            </div>
+
+            <div class="hud-border p-6 text-center reveal bg-void/80 hover:-translate-y-2 transition-transform duration-300 shadow-[0_4px_20px_rgba(0,0,0,0.5)]" style="transition-delay: 200ms;">
+                <div class="w-20 h-20 mx-auto bg-darkgray border border-echoblue/30 rounded-full mb-4 flex items-center justify-center overflow-hidden">
+                    <svg class="w-10 h-10 text-panel/20" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="1.5" d="M16 7a4 4 0 11-8 0 4 4 0 018 0zM12 14a7 7 0 00-7 7h14a7 7 0 00-7-7z"></path></svg>
+                </div>
+                <h5 class="font-bold text-sm text-panel">[ TO BE ASSIGNED ]</h5>
+                <p class="font-mono text-[10px] text-recovery mt-2">LEVEL DESIGNER</p>
+            </div>
+
+            <div class="hud-border p-6 text-center reveal bg-void/80 hover:-translate-y-2 transition-transform duration-300 shadow-[0_4px_20px_rgba(0,0,0,0.5)]" style="transition-delay: 300ms;">
+                <div class="w-20 h-20 mx-auto bg-darkgray border border-echoblue/30 rounded-full mb-4 flex items-center justify-center overflow-hidden">
+                    <svg class="w-10 h-10 text-panel/20" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="1.5" d="M16 7a4 4 0 11-8 0 4 4 0 018 0zM12 14a7 7 0 00-7 7h14a7 7 0 00-7-7z"></path></svg>
+                </div>
+                <h5 class="font-bold text-sm text-panel">[ TO BE ASSIGNED ]</h5>
+                <p class="font-mono text-[10px] text-ghost mt-2">SYSTEMS &amp; UI</p>
+            </div>
+        </div>
+    </section>
+
+    <section id="alpha-intake" class="py-24 relative z-10 border-t border-echoblue/20 bg-gradient-to-b from-darkgray to-void">
+        <div class="max-w-3xl mx-auto px-6 text-center reveal">
+            <div class="inline-block border border-hazard text-hazard px-3 py-1 font-mono text-xs mb-6 animate-pulse">RESTRICTED ACCESS</div>
+            <h2 class="text-4xl md:text-5xl font-black mb-4 glitch-text" data-text="VOLUNTEER FOR CALIBRATION">VOLUNTEER FOR CALIBRATION</h2>
+            <p class="text-panel/70 font-light mb-8">The Echo Track requires new data. Submit your credentials to request access to the Alpha Test phase. Survival is not guaranteed. Data collection is mandatory.</p>
+            
+            <form class="flex flex-col sm:flex-row gap-4 justify-center max-w-xl mx-auto" onsubmit="event.preventDefault();">
+                <div class="relative w-full sm:w-2/3">
+                    <div class="absolute inset-y-0 left-0 flex items-center pl-3 pointer-events-none">
+                        <svg class="w-5 h-5 text-echoblue/50" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M3 8l7.89 5.26a2 2 0 002.22 0L21 8M5 19h14a2 2 0 002-2V7a2 2 0 00-2-2H5a2 2 0 00-2 2v10a2 2 0 002 2z"></path></svg>
+                    </div>
+                    <input type="email" required placeholder="ENTER SECURE COMM-LINK (EMAIL)" class="w-full bg-void border border-echoblue/30 text-panel font-mono text-[11px] sm:text-xs pl-10 pr-4 py-4 focus:outline-none focus:border-echoblue focus:ring-1 focus:ring-echoblue transition-all placeholder:text-panel/30">
+                </div>
+                <button type="submit" class="bg-echoblue text-void font-bold font-mono py-4 px-8 hover:bg-panel hover:text-void transition-all duration-300 shadow-[0_0_15px_rgba(58,172,255,0.4)] whitespace-nowrap text-xs sm:text-sm">
+                    REQUEST ACCESS
+                </button>
+            </form>
+            <p class="mt-6 font-mono text-[10px] text-panel/40">By submitting, you agree to the indefinite retention of your biological and kinetic data.</p>
         </div>
     </section>
 
