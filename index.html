@@ -598,11 +598,18 @@
 
     <script>
         
-        // --- Audio System (Tone.js) ---
+// --- Audio System (Tone.js) ---
 let audioInitialized = false;
 let hoverSynth, clickSynth, modalSynth;
-let soundtrackPlayer;
 let isMuted = true;
+
+// Create the player instance immediately
+const soundtrackPlayer = new Tone.Player({
+    url: "alex-morgan-horror-thriller-545512.mp3", 
+    loop: true,
+    autostart: false
+}).toDestination();
+soundtrackPlayer.volume.value = -10;
 
 async function initAudio() {
     if (audioInitialized) return;
@@ -629,14 +636,6 @@ async function initAudio() {
     }).toDestination();
     modalSynth.volume.value = -20;
 
-    // Setup Soundtrack Player
-    soundtrackPlayer = new Tone.Player({
-        url: "alex-morgan-horror-thriller-545512.mp3", 
-        loop: true,
-        autostart: false
-    }).toDestination();
-    soundtrackPlayer.volume.value = -10;
-
     audioInitialized = true;
 }
 
@@ -646,7 +645,7 @@ function playClick() { if(audioInitialized) clickSynth.triggerAttackRelease("C2"
 function playModalOpen() { if(audioInitialized) modalSynth.triggerAttackRelease("E4", "8n"); }
 function playModalClose() { if(audioInitialized) modalSynth.triggerAttackRelease("A3", "8n"); }
 
-// Mute/Unmute Logic with safe buffer checks
+// Mute/Unmute Logic with explicit async load awaiting
 const audioToggleBtn = document.getElementById('audio-toggle');
 const iconMute = document.getElementById('icon-mute');
 const iconUnmute = document.getElementById('icon-unmute');
@@ -656,17 +655,17 @@ audioToggleBtn.addEventListener('click', async () => {
     
     if (isMuted) {
         Tone.Destination.mute = false;
-        // Safely check if buffer is loaded before starting
-        if (soundtrackPlayer && soundtrackPlayer.loaded) {
-            soundtrackPlayer.start();
+        // Wait for buffer to finish loading if it hasn't already
+        if (!soundtrackPlayer.loaded) {
+            await soundtrackPlayer.load("alex-morgan-horror-thriller-545512.mp3");
         }
+        soundtrackPlayer.start();
         isMuted = false;
         iconMute.classList.add('hidden');
         iconUnmute.classList.remove('hidden');
     } else {
         Tone.Destination.mute = true;
-        // Safely check state before stopping to prevent the "start must be called before stop" error
-        if (soundtrackPlayer && soundtrackPlayer.state === "started") {
+        if (soundtrackPlayer.state === "started") {
             soundtrackPlayer.stop();
         }
         isMuted = true;
