@@ -599,88 +599,84 @@
     <script>
         
         // --- Audio System (Tone.js) ---
-        let audioInitialized = false;
-        let hoverSynth, clickSynth, modalSynth;
-        let soundtrackPlayer;
-        let isMuted = true;
+let audioInitialized = false;
+let hoverSynth, clickSynth, modalSynth;
+let soundtrackPlayer;
+let isMuted = true;
 
-        async function initAudio() {
-            if (audioInitialized) return;
-            await Tone.start(); // Audio context must be started by user action
-            
-            // Techy short blip for hovering over interactive elements
-            hoverSynth = new Tone.PolySynth(Tone.Synth, {
-                oscillator: { type: "sine" },
-                envelope: { attack: 0.01, decay: 0.1, sustain: 0, release: 0.1 }
-            }).toDestination();
-            hoverSynth.volume.value = -18;
+async function initAudio() {
+    if (audioInitialized) return;
+    await Tone.start(); 
+    
+    hoverSynth = new Tone.PolySynth(Tone.Synth, {
+        oscillator: { type: "sine" },
+        envelope: { attack: 0.01, decay: 0.1, sustain: 0, release: 0.1 }
+    }).toDestination();
+    hoverSynth.volume.value = -18;
 
-            // Deeper digital thud for clicks
-            clickSynth = new Tone.MembraneSynth({
-                pitchDecay: 0.05,
-                octaves: 4,
-                oscillator: { type: "square" },
-                envelope: { attack: 0.01, decay: 0.2, sustain: 0, release: 0.1 }
-            }).toDestination();
-            clickSynth.volume.value = -10;
+    clickSynth = new Tone.MembraneSynth({
+        pitchDecay: 0.05, octaves: 4,
+        oscillator: { type: "square" },
+        envelope: { attack: 0.01, decay: 0.2, sustain: 0, release: 0.1 }
+    }).toDestination();
+    clickSynth.volume.value = -10;
 
-            // Ethereal sweep when opening/closing data logs
-            modalSynth = new Tone.FMSynth({
-                modulationIndex: 12.22,
-                envelope: { attack: 0.1, decay: 0.2, sustain: 0.8, release: 0.5 },
-                modulation: { type: "square" },
-                modulationEnvelope: { attack: 0.1, decay: 0.2, sustain: 0.3, release: 0.1 }
-            }).toDestination();
-            modalSynth.volume.value = -20;
+    modalSynth = new Tone.FMSynth({
+        modulationIndex: 12.22,
+        envelope: { attack: 0.1, decay: 0.2, sustain: 0.8, release: 0.5 },
+        modulation: { type: "square" },
+        modulationEnvelope: { attack: 0.1, decay: 0.2, sustain: 0.3, release: 0.1 }
+    }).toDestination();
+    modalSynth.volume.value = -20;
 
-            // Setup Soundtrack Player (Change URL filename below whenever ready)
-            soundtrackPlayer = new Tone.Player({
-                url: "alex-morgan-horror-thriller-545512.mp3", 
-                loop: true,
-                autostart: false
-            }).toDestination();
-            soundtrackPlayer.volume.value = -10;
+    // Setup Soundtrack Player
+    soundtrackPlayer = new Tone.Player({
+        url: "alex-morgan-horror-thriller-545512.mp3", 
+        loop: true,
+        autostart: false
+    }).toDestination();
+    soundtrackPlayer.volume.value = -10;
 
-            audioInitialized = true;
+    audioInitialized = true;
+}
+
+// SFX Trigger Functions
+function playHover() { if(audioInitialized) hoverSynth.triggerAttackRelease(["C5", "E5"], "32n"); }
+function playClick() { if(audioInitialized) clickSynth.triggerAttackRelease("C2", "16n"); }
+function playModalOpen() { if(audioInitialized) modalSynth.triggerAttackRelease("E4", "8n"); }
+function playModalClose() { if(audioInitialized) modalSynth.triggerAttackRelease("A3", "8n"); }
+
+// Mute/Unmute Logic with safe buffer checks
+const audioToggleBtn = document.getElementById('audio-toggle');
+const iconMute = document.getElementById('icon-mute');
+const iconUnmute = document.getElementById('icon-unmute');
+
+audioToggleBtn.addEventListener('click', async () => {
+    await initAudio();
+    
+    if (isMuted) {
+        Tone.Destination.mute = false;
+        // Safely check if buffer is loaded before starting
+        if (soundtrackPlayer && soundtrackPlayer.loaded) {
+            soundtrackPlayer.start();
         }
-
-        // SFX Trigger Functions
-        function playHover() { if(audioInitialized) hoverSynth.triggerAttackRelease(["C5", "E5"], "32n"); }
-        function playClick() { if(audioInitialized) clickSynth.triggerAttackRelease("C2", "16n"); }
-        function playModalOpen() { if(audioInitialized) modalSynth.triggerAttackRelease("E4", "8n"); }
-        function playModalClose() { if(audioInitialized) modalSynth.triggerAttackRelease("A3", "8n"); }
-
-        // Mute/Unmute Logic
-        const audioToggleBtn = document.getElementById('audio-toggle');
-        const iconMute = document.getElementById('icon-mute');
-        const iconUnmute = document.getElementById('icon-unmute');
-
-        audioToggleBtn.addEventListener('click', async () => {
-            await initAudio();
-            
-            if (isMuted) {
-                // Unmute
-                if (soundtrackPlayer && soundtrackPlayer.loaded) {
-                    soundtrackPlayer.start();
-                } else if (soundtrackPlayer) {
-                    // Try to start even if loading state check is pending
-                    soundtrackPlayer.start();
-                }
-                Tone.Destination.mute = false;
-                isMuted = false;
-                iconMute.classList.add('hidden');
-                iconUnmute.classList.remove('hidden');
-            } else {
-                // Mute
-                Tone.Destination.mute = true;
-                isMuted = true;
-                iconMute.classList.remove('hidden');
-                iconUnmute.classList.add('hidden');
-            }
-        });
-
-        // Set initial muted state
+        isMuted = false;
+        iconMute.classList.add('hidden');
+        iconUnmute.classList.remove('hidden');
+    } else {
         Tone.Destination.mute = true;
+        // Safely check state before stopping to prevent the "start must be called before stop" error
+        if (soundtrackPlayer && soundtrackPlayer.state === "started") {
+            soundtrackPlayer.stop();
+        }
+        isMuted = true;
+        iconMute.classList.remove('hidden');
+        iconUnmute.classList.add('hidden');
+    }
+});
+
+// Initial state
+Tone.Destination.mute = true;
 
         // Bind global init to the first user interaction
         window.addEventListener('click', initAudio, { once: true });
