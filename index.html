@@ -4,6 +4,8 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>ECHO RUN | The Last Calibration</title>
+    
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/tone/14.8.49/Tone.js"></script>
     <script src="https://cdn.tailwindcss.com"></script>
     <link rel="preconnect" href="https://fonts.googleapis.com">
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
@@ -139,9 +141,65 @@
         .info-border {
             border-left: 4px solid #3AACFF;
         }
+
+        #bg-dots {
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100vw;
+            height: 100vh;
+            z-index: 1; /* Sits above the void base color, but behind main content */
+            pointer-events: none;
+            opacity: 0.35;
+        }
+        
+        #lightbox {
+            position: fixed;
+            inset: 0;
+            z-index: 100000;
+            background: rgba(0,0,19,0.95);
+            backdrop-filter: blur(8px);
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            opacity: 0;
+            pointer-events: none;
+            transition: opacity 0.4s cubic-bezier(0.4, 0, 0.2, 1);
+        }
+        #lightbox.active {
+            opacity: 1;
+            pointer-events: auto;
+        }
+        #lightbox-img {
+            max-width: 90vw;
+            max-height: 90vh;
+            border: 2px solid #3AACFF;
+            box-shadow: 0 0 40px rgba(58,172,255,0.3);
+            transform: scale(0.95);
+            transition: transform 0.4s cubic-bezier(0.4, 0, 0.2, 1);
+        }
+        #lightbox.active #lightbox-img {
+            transform: scale(1);
+        }
+        #lightbox-close {
+            position: absolute;
+            top: 2rem;
+            right: 2rem;
+            color: #FF5A1A;
+            font-family: 'Share Tech Mono', monospace;
+            font-size: 1.5rem;
+            cursor: pointer;
+            transition: color 0.3s;
+            text-shadow: 0 0 10px rgba(255,90,26,0.5);
+        }
+        #lightbox-close:hover {
+            color: #F0EFF8;
+        }
     </style>
 </head>
 <body class="antialiased selection:bg-echoblue selection:text-void">
+
+    <canvas id="bg-dots"></canvas>
 
     <div class="scanline-overlay"></div>
 
@@ -159,7 +217,6 @@
     </nav>
 
     <header class="relative w-full h-screen flex items-center justify-center overflow-hidden">
-        <!-- Background Image (Gameplay Screenshot) -->
         <div class="absolute inset-0 z-0">
             <img src="WhatsApp Image 2026-07-12 at 3.54.40 PM (1).jpeg" alt="Echo Run Gameplay" class="w-full h-full object-cover object-center opacity-40 scale-105 transform origin-center animate-[pulse_10s_ease-in-out_infinite]" />
             <div class="absolute inset-0 bg-gradient-to-t from-void via-void/80 to-transparent"></div>
@@ -172,7 +229,6 @@
             <h2 class="text-2xl md:text-4xl font-light tracking-[0.2em] text-echoblue mb-8">THE LAST CALIBRATION</h2>
             
             <div class="hud-border p-6 md:p-8 mt-8 max-w-2xl reveal">
-                <!-- Referencing Image 6 visually via text -->
                 <p class="text-lg md:text-2xl font-light italic text-panel/80 mb-4 border-l-2 border-echoblue pl-4 text-left">
                     "A training facility that remembers every failed run."
                 </p>
@@ -188,7 +244,6 @@
             </div>
         </div>
         
-        <!-- HUD Elements Overlay -->
         <div class="absolute top-24 left-6 hidden md:block font-mono text-[10px] text-panel/40 leading-tight">
             SYS.MEM: OVERLOAD<br>
             CORRUPTION: 72%<br>
@@ -230,7 +285,6 @@
             </div>
             
             <div class="reveal relative">
-                <!-- Embedding Image 6 as a thematic element -->
                 <div class="hud-border p-2">
                     <div class="absolute -top-3 -right-3 bg-void border border-echoblue px-2 py-1 font-mono text-[10px] text-echoblue z-10">CORE_PREMISE.jpeg</div>
                     <img src="WhatsApp Image 2026-07-12 at 3.54.40 PM (5).jpeg" alt="Core Premise Document" class="w-full h-auto opacity-80 hover:opacity-100 transition-opacity filter contrast-125" />
@@ -247,44 +301,37 @@
                 <p class="font-mono text-sm text-panel/50">SECTOR OVERVIEW // 6 STAGES TO EXTRACTION</p>
             </div>
 
-            <!-- Embedding Image 1 as the master layout reference -->
             <div class="mb-20 reveal hud-border p-2 relative">
                 <div class="absolute -top-3 -left-3 bg-void border border-echoblue px-2 py-1 font-mono text-[10px] text-echoblue z-10">LEVEL_GEOMETRY.jpeg</div>
                 <img src="WhatsApp Image 2026-07-12 at 3.54.40 PM.jpeg" alt="Echo Run Concept Overview" class="w-full h-auto shadow-[0_0_30px_rgba(0,0,0,0.8)]" />
             </div>
 
             <div class="grid md:grid-cols-2 lg:grid-cols-3 gap-6">
-                <!-- Stage 1 -->
                 <div class="hud-border p-6 info-border reveal">
                     <div class="font-mono text-echoblue mb-2 text-sm">STAGE 01</div>
                     <h4 class="text-xl font-bold mb-3">WAKE CORRIDOR</h4>
                     <p class="text-sm text-panel/70">A tilted medical corridor. Low-intensity blue emergency strips guide the way forward. The calm before the trial.</p>
                 </div>
-                <!-- Stage 2 -->
                 <div class="hud-border p-6 info-border reveal" style="transition-delay: 100ms;">
                     <div class="font-mono text-echoblue mb-2 text-sm">STAGE 02</div>
                     <h4 class="text-xl font-bold mb-3">MOVEMENT HALL</h4>
                     <p class="text-sm text-panel/70">A long runway demanding momentum. Distance creates urgency. Reflective floor highlights emphasize speed.</p>
                 </div>
-                <!-- Stage 3 -->
                 <div class="hud-border p-6 hazard-border reveal" style="transition-delay: 200ms;">
                     <div class="font-mono text-hazard mb-2 text-sm">STAGE 03</div>
                     <h4 class="text-xl font-bold mb-3">BROKEN FLOOR</h4>
                     <p class="text-sm text-panel/70">Gaps and broken panels test timing and jumps. The void below is fatal. Orange underlight warns of the danger.</p>
                 </div>
-                <!-- Stage 4 -->
                 <div class="hud-border p-6 hazard-border reveal">
                     <div class="font-mono text-hazard mb-2 text-sm">STAGE 04</div>
                     <h4 class="text-xl font-bold mb-3">HEAT VENTS</h4>
                     <p class="text-sm text-panel/70">Strong orange emissive panels deal rapid damage on contact. Find a safer route or risk the burn.</p>
                 </div>
-                <!-- Stage 5 -->
                 <div class="hud-border p-6 safe-border reveal" style="transition-delay: 100ms;">
                     <div class="font-mono text-recovery mb-2 text-sm">STAGE 05</div>
                     <h4 class="text-xl font-bold mb-3">RECOVERY ALCOVE</h4>
                     <p class="text-sm text-panel/70">A rare safe space. Soft green radial light. Step on the pad to initiate a Recovery Pulse and restore vital HP.</p>
                 </div>
-                <!-- Stage 6 -->
                 <div class="hud-border p-6 info-border reveal" style="transition-delay: 200ms;">
                     <div class="font-mono text-echoblue mb-2 text-sm">STAGE 06</div>
                     <h4 class="text-xl font-bold mb-3">FINAL SPRINT & EXTRACT</h4>
@@ -295,10 +342,8 @@
     </section>
 
     <section id="subject-mara" class="py-32 relative z-10 w-full overflow-hidden border-b border-echoblue/10 bg-void">
-        <!-- Seamless Background integration of Mara -->
         <div class="absolute inset-0 z-0">
             <img src="Gemini_Generated_Image_i2wwybi2wwybi2ww-clean.png" alt="Subject Mara" class="w-full h-full object-cover object-center opacity-70 mix-blend-screen" style="mask-image: linear-gradient(to bottom, transparent 0%, black 15%, black 85%, transparent 100%); -webkit-mask-image: linear-gradient(to bottom, transparent 0%, black 15%, black 85%, transparent 100%);" />
-            <!-- Gradients to blend the image seamlessly into the void color -->
             <div class="absolute inset-0 bg-gradient-to-r from-void via-void/80 to-transparent md:w-2/3"></div>
             <div class="absolute inset-0 bg-gradient-to-t from-void via-transparent to-void"></div>
             <div class="absolute inset-0 bg-gradient-to-l from-void/50 via-transparent to-transparent"></div>
@@ -334,15 +379,13 @@
                 </div>
             </div>
             <div class="h-64 md:h-[500px]">
-                <!-- Empty container to frame the background image of Mara (back view) on the right -->
-            </div>
+                </div>
         </div>
     </section>
 
     <section id="mechanics" class="py-24 relative z-10 px-6 max-w-7xl mx-auto">
         <div class="grid lg:grid-cols-12 gap-12">
             
-            <!-- Mechanics Copy -->
             <div class="lg:col-span-5 flex flex-col justify-center reveal">
                 <div class="flex items-center gap-3 mb-6">
                     <div class="w-12 h-[2px] bg-hazard"></div>
@@ -384,7 +427,6 @@
                 </div>
             </div>
 
-            <!-- Embedding Image 2 (Mechanics Specs) & Image 3 (Visual Design) as Data Tables -->
             <div class="lg:col-span-7 space-y-6">
                 <div class="hud-border p-2 reveal">
                     <div class="bg-void px-4 py-2 border-b border-echoblue/20 flex justify-between items-center">
@@ -544,27 +586,230 @@
         <p>&copy; 2026 Echo Run Simulation. All corrupted data is final.</p>
     </footer>
 
-    <script>
-        document.addEventListener('DOMContentLoaded', () => {
-            // Scroll Reveal Logic
-            const revealElements = document.querySelectorAll('.reveal');
+    <button id="audio-toggle" class="fixed bottom-6 right-6 z-[1000] p-4 rounded-full bg-void border border-echoblue/50 text-echoblue hover:border-echoblue hover:text-white shadow-[0_0_15px_rgba(58,172,255,0.3)] transition-all duration-300 cursor-pointer">
+        <svg id="icon-mute" class="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M5.586 15H4a1 1 0 01-1-1v-4a1 1 0 011-1h1.586l4.707-4.707C10.923 3.663 12 4.109 12 5v14c0 .891-1.077 1.337-1.707.707L5.586 15zM17 14l2-2m0 0l2-2m-2 2l-2-2m2 2l2 2"></path></svg>
+        <svg id="icon-unmute" class="hidden w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15.536 8.464a5 5 0 010 7.072m2.828-9.9a9 9 0 010 12.728M5.586 15H4a1 1 0 01-1-1v-4a1 1 0 011-1h1.586l4.707-4.707C10.923 3.663 12 4.109 12 5v14c0 .891-1.077 1.337-1.707.707L5.586 15z"></path></svg>
+    </button>
 
+    <div id="lightbox" onclick="closeLightbox(event)">
+        <div id="lightbox-close">[X] CLOSE_VISUAL</div>
+        <img id="lightbox-img" src="" alt="Enlarged Visual Data">
+    </div>
+
+    <script>
+        
+        // --- Audio System (Tone.js) ---
+        let audioInitialized = false;
+        let hoverSynth, clickSynth, modalSynth;
+        let soundtrackPlayer;
+        let isMuted = true;
+
+        async function initAudio() {
+            if (audioInitialized) return;
+            await Tone.start(); // Audio context must be started by user action
+            
+            // Techy short blip for hovering over interactive elements
+            hoverSynth = new Tone.PolySynth(Tone.Synth, {
+                oscillator: { type: "sine" },
+                envelope: { attack: 0.01, decay: 0.1, sustain: 0, release: 0.1 }
+            }).toDestination();
+            hoverSynth.volume.value = -18;
+
+            // Deeper digital thud for clicks
+            clickSynth = new Tone.MembraneSynth({
+                pitchDecay: 0.05,
+                octaves: 4,
+                oscillator: { type: "square" },
+                envelope: { attack: 0.01, decay: 0.2, sustain: 0, release: 0.1 }
+            }).toDestination();
+            clickSynth.volume.value = -10;
+
+            // Ethereal sweep when opening/closing data logs
+            modalSynth = new Tone.FMSynth({
+                modulationIndex: 12.22,
+                envelope: { attack: 0.1, decay: 0.2, sustain: 0.8, release: 0.5 },
+                modulation: { type: "square" },
+                modulationEnvelope: { attack: 0.1, decay: 0.2, sustain: 0.3, release: 0.1 }
+            }).toDestination();
+            modalSynth.volume.value = -20;
+
+            // Setup Soundtrack Player (Change URL filename below whenever ready)
+            soundtrackPlayer = new Tone.Player({
+                url: "alex-morgan-horror-thriller-545512.mp3", 
+                loop: true,
+                autostart: false
+            }).toDestination();
+            soundtrackPlayer.volume.value = -10;
+
+            audioInitialized = true;
+        }
+
+        // SFX Trigger Functions
+        function playHover() { if(audioInitialized) hoverSynth.triggerAttackRelease(["C5", "E5"], "32n"); }
+        function playClick() { if(audioInitialized) clickSynth.triggerAttackRelease("C2", "16n"); }
+        function playModalOpen() { if(audioInitialized) modalSynth.triggerAttackRelease("E4", "8n"); }
+        function playModalClose() { if(audioInitialized) modalSynth.triggerAttackRelease("A3", "8n"); }
+
+        // Mute/Unmute Logic
+        const audioToggleBtn = document.getElementById('audio-toggle');
+        const iconMute = document.getElementById('icon-mute');
+        const iconUnmute = document.getElementById('icon-unmute');
+
+        audioToggleBtn.addEventListener('click', async () => {
+            await initAudio();
+            
+            if (isMuted) {
+                // Unmute
+                if (soundtrackPlayer && soundtrackPlayer.loaded) {
+                    soundtrackPlayer.start();
+                } else if (soundtrackPlayer) {
+                    // Try to start even if loading state check is pending
+                    soundtrackPlayer.start();
+                }
+                Tone.Destination.mute = false;
+                isMuted = false;
+                iconMute.classList.add('hidden');
+                iconUnmute.classList.remove('hidden');
+            } else {
+                // Mute
+                Tone.Destination.mute = true;
+                isMuted = true;
+                iconMute.classList.remove('hidden');
+                iconUnmute.classList.add('hidden');
+            }
+        });
+
+        // Set initial muted state
+        Tone.Destination.mute = true;
+
+        // Bind global init to the first user interaction
+        window.addEventListener('click', initAudio, { once: true });
+        window.addEventListener('keydown', initAudio, { once: true });
+
+        // --- Lightbox / Image Zoom System ---
+        const lightbox = document.getElementById('lightbox');
+        const lightboxImg = document.getElementById('lightbox-img');
+        
+        window.openLightbox = function(src) {
+            playClick();
+            setTimeout(playModalOpen, 100);
+            lightboxImg.src = src;
+            lightbox.classList.add('active');
+        };
+
+        window.closeLightbox = function(e) {
+            // Close if clicking anywhere except directly on the image
+            if (e.target !== lightboxImg) {
+                playModalClose();
+                lightbox.classList.remove('active');
+            }
+        };
+
+        // --- Abstract Dotted Background Animation ---
+        const canvas = document.getElementById('bg-dots');
+        const ctx = canvas.getContext('2d');
+        let width, height;
+        let dots = [];
+
+        function resizeCanvas() {
+            width = canvas.width = window.innerWidth;
+            height = canvas.height = window.innerHeight;
+            initDots();
+        }
+
+        function initDots() {
+            dots = [];
+            // Dynamically calculate node density based on screen size
+            let numDots = Math.floor((width * height) / 12000);
+            for(let i=0; i<numDots; i++) {
+                dots.push({
+                    x: Math.random() * width,
+                    y: Math.random() * height,
+                    vx: (Math.random() - 0.5) * 0.4,
+                    vy: (Math.random() - 0.5) * 0.4,
+                    size: Math.random() * 1.5 + 0.5,
+                    baseAlpha: Math.random() * 0.5 + 0.1
+                });
+            }
+        }
+
+        function animateDots() {
+            ctx.clearRect(0, 0, width, height);
+            ctx.fillStyle = '#3AACFF'; // echoblue
+            
+            for(let i=0; i<dots.length; i++) {
+                let dot = dots[i];
+                dot.x += dot.vx;
+                dot.y += dot.vy;
+                
+                // Wrap around edges for a seamless infinite network
+                if(dot.x < 0) dot.x = width;
+                if(dot.x > width) dot.x = 0;
+                if(dot.y < 0) dot.y = height;
+                if(dot.y > height) dot.y = 0;
+                
+                ctx.globalAlpha = dot.baseAlpha;
+                ctx.beginPath();
+                ctx.arc(dot.x, dot.y, dot.size, 0, Math.PI * 2);
+                ctx.fill();
+            }
+
+            // Draw neural connections between close dots
+            ctx.strokeStyle = '#3AACFF';
+            for(let i=0; i<dots.length; i++) {
+                for(let j=i+1; j<dots.length; j++) {
+                    let dx = dots[i].x - dots[j].x;
+                    let dy = dots[i].y - dots[j].y;
+                    let dist = dx*dx + dy*dy;
+                    if(dist < 8000) {
+                        ctx.globalAlpha = (1 - dist/8000) * 0.15;
+                        ctx.beginPath();
+                        ctx.moveTo(dots[i].x, dots[i].y);
+                        ctx.lineTo(dots[j].x, dots[j].y);
+                        ctx.stroke();
+                    }
+                }
+            }
+            requestAnimationFrame(animateDots);
+        }
+
+        window.addEventListener('resize', resizeCanvas);
+        resizeCanvas();
+        animateDots();
+
+        // --- DOM Ready Hooks ---
+        document.addEventListener('DOMContentLoaded', () => {
+            // Scroll Reveal Logic (Existing behavior mapped in)
+            const revealElements = document.querySelectorAll('.reveal');
             const revealObserver = new IntersectionObserver((entries, observer) => {
                 entries.forEach(entry => {
                     if (entry.isIntersecting) {
                         entry.target.classList.add('active');
-                        // Optional: Stop observing once revealed
-                        // observer.unobserve(entry.target); 
                     }
                 });
             }, {
                 root: null,
-                threshold: 0.15, // Trigger when 15% visible
+                threshold: 0.15,
                 rootMargin: "0px 0px -50px 0px"
             });
+            revealElements.forEach(el => revealObserver.observe(el));
 
-            revealElements.forEach(el => {
-                revealObserver.observe(el);
+            // Attach interactive hover & click logic specifically to visual data images
+            const visualImages = document.querySelectorAll('img[alt="Core Premise Document"], img[alt="Echo Run Concept Overview"], img[alt="Game Mechanics Specification"], img[alt="Visual Design Language"], img[alt="Assets and VFX Brief"]');
+            
+            visualImages.forEach(img => {
+                // Add tailwind classes dynamically for a premium interaction feel
+                img.classList.add('cursor-pointer', 'transition-all', 'duration-300', 'hover:scale-[1.03]', 'hover:brightness-125', 'hover:shadow-[0_0_25px_rgba(58,172,255,0.6)]', 'relative', 'z-20');
+                
+                img.addEventListener('click', () => openLightbox(img.src));
+                img.addEventListener('mouseenter', playHover);
+            });
+
+            // Attach SFX to all links and buttons for UI consistency
+            const interactiveElements = document.querySelectorAll('a, button');
+            interactiveElements.forEach(el => {
+                el.addEventListener('mouseenter', playHover);
+                el.addEventListener('click', playClick);
             });
         });
     </script>
